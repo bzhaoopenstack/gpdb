@@ -1,0 +1,14 @@
+- project:
+    name: bzhaoopenstack/gpdb
+    check:
+      jobs:
+        - greenplum-build-arm64
+
+- job:
+    name: greenplum-build-arm64
+    parent: init-test
+    description: |
+      The greenplum build in openlab allinone cluster.
+    run: .zuul/playbooks/greenplum-build/run.yaml
+    nodeset: ubuntu-xenial-arm64
+    timeout: 86400
