@@ -1,0 +1,11 @@
+- hosts: all
+  tasks:
+    - name: Build greenplum
+      shell:
+        cmd: |
+          set -exo pipefail
+          sudo apt-get update -y
+          sleep 36000
+        chdir: '/home/zuul/src'
+        executable: /bin/bash
+      environment: '{{ global_env }}'
