@@ -28,6 +28,7 @@ addons:
             - libapr1-dev
             - libzstd1
             - libzstd1-dev
+            - pip
 
 matrix:
     include:
