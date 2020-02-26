@@ -1,7 +1,7 @@
 **Concourse Pipeline** [![Concourse Build Status](https://prod.ci.gpdb.pivotal.io/api/v1/teams/main/pipelines/gpdb_master/badge)](https://prod.ci.gpdb.pivotal.io/teams/main/pipelines/gpdb_master) |
 **Travis Build** [![Travis Build Status](https://travis-ci.org/greenplum-db/gpdb.svg?branch=master)](https://travis-ci.org/greenplum-db/gpdb) |
 **Zuul ARM Build**[![Zuul ARM Build Status](https://zuul-ci.org/gated.svg)](http://80.158.17.129/builds/builds?project=bzhaoopenstack%2Fgpdb&job_name=test-check-api) |
-**Zuul Single Build Test**[![Zuul Single Build Status](http://159.138.104.222:15000/badge?project=bzhaoopenstack%2Fgpdb)](http://80.158.17.129/builds/builds?project=bzhaoopenstack%2Fgpdb)
+**Zuul Single Build Test**[![Zuul Single Build Status](http://159.138.104.222:15000/badge?project=bzhaoopenstack%2Fgpdb&job_name=test-check-api)](http://80.158.17.129/builds/builds?project=bzhaoopenstack%2Fgpdb)
 
 ----------------------------------------------------------------------
 
