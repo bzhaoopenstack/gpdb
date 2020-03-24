@@ -2,7 +2,7 @@
 **Travis Build** [![Travis Build Status](https://travis-ci.org/greenplum-db/gpdb.svg?branch=master)](https://travis-ci.org/greenplum-db/gpdb) |
 **Zuul ARM Build**[![Zuul ARM Build Status](https://zuul-ci.org/gated.svg)](http://80.158.17.129/builds/builds?project=bzhaoopenstack%2Fgpdb&job_name=test-check-api) |
 **Zuul Single Build Test**[![Zuul Single Build Status](http://159.138.104.222:15000/badge?project=bzhaoopenstack%2Fgpdb&job_name=test-check-api)](http://80.158.17.129/builds/builds?project=bzhaoopenstack%2Fgpdb&job_name=test-check-api)
-**Zuul Regression Test**[![Zuul Regression Test](http://159.138.104.222:15000/badge?project=bzhaoopenstack%2Fgpdb&job_name=test-check-api)](https://status.openlabtesting.org/builds/builds?project=greenplum-db%2Fgpdb&job_name=gpdb-installcheck-world-tests-on-arm64)
+**Zuul Regression Test**[![Zuul Regression Test](http://159.138.104.222:15000/badge?project=greenplum-db%2Fgpdb&job_name=test-check-api)](https://status.openlabtesting.org/builds/builds?project=greenplum-db%2Fgpdb&job_name=gpdb-installcheck-world-tests-on-arm64)
 ----------------------------------------------------------------------
 
 ![Greenplum](logo-greenplum.png)
