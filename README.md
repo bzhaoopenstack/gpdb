@@ -6,7 +6,7 @@
 
 ![Greenplum](logo-greenplum.png)
 
-Greenplum Database (GPDB) is an advanced, fully featured, open
+Greenplum Database (GPDB) is an advanced, fully feat1ured, open
 source data warehouse, based on PostgreSQL. It provides powerful and rapid analytics on
 petabyte scale data volumes. Uniquely geared toward big data
 analytics, Greenplum Database is powered by the world’s most advanced
