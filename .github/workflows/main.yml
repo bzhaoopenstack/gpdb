@@ -25,7 +25,7 @@ jobs:
     - name: install deps - mine
       run: |
         sudo apt update
-        sudo apt install software-properties-common -y
+        sudo apt install software-properties-common git-all -y
 
     - name: install deps
       run: |
@@ -51,6 +51,7 @@ jobs:
 
     - name: Run test script
       run: |
+        cd bzhaoopenstack/gpdb
         cat <<EOF > test.sh
         set -eo pipefail
         if [ "$T" = "debug" ]; then
