@@ -9,13 +9,112 @@ on:
 jobs:
   build:
     runs-on: self-hosted
+    env:
+      T: debug
+      C: ""
+      OVERRIDE_CC: "CC=gcc-8"
+      OVERRIDE_CXX: "CXX=g++-8"
+      TRAVIS_COMPILER: gcc
+      CC: ${CC:-gcc}
+      CC_FOR_BUILD: ${CC_FOR_BUILD:-gcc}
 
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    - name: Run `uname -a` in Kunpeng env
+    - name: install deps
       run: |
-        uname -a
-        cat /etc/os-release
-        lscpu | grep -E "Architecture|Model name|CPU\(s\):"
+        sudo -E apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+        sudo apt update
+        sudo -E apt-get -yq --no-install-suggests --no-install-recommends $(travis_apt_get_options) install gcc-8 libxml2 libxml2-dev libevent-dev libperl-dev g++-8 python-dev python-yaml libapr1-dev libzstd1 libzstd1-dev python-pip
+    
+    - name: clone code
+      run: |
+        git clone --depth=50 https://github.com/bzhaoopenstack/gpdb.git bzhaoopenstack/gpdb
+
+    - name: install python deps
+      run: |
+        pip install --user --upgrade pip
+        pip install --user --pre psutil
+        pip install --user lockfile
+        pip install --user setuptools
+    
+    - name: before run scripts
+      run: |
+        ssh-keygen -t "rsa" -f ~/.ssh/id_rsa -N ""
+        cp ~/.ssh/{id_rsa.pub,authorized_keys}
+
+    - name: Run test script
+      run: |
+        cat <<EOF > test.sh
+        set -eo pipefail
+        if [ "$T" = "debug" ]; then
+          ./configure \
+              --prefix=${TRAVIS_BUILD_DIR}/gpsql \
+              --enable-cassert \
+              --enable-debug \
+              --enable-debug-extensions \
+              --with-perl \
+              --with-python \
+              --disable-orca \
+              --with-openssl \
+              --with-ldap \
+              --with-libcurl \
+              --with-libxml \
+              --enable-mapreduce \
+              --enable-orafce \
+              $C
+          make -s install
+          source ${TRAVIS_BUILD_DIR}/gpsql/greenplum_path.sh
+          make -s unittest-check
+          make -C gpAux/gpdemo cluster
+          source gpAux/gpdemo/gpdemo-env.sh
+          make -C src/test/regress installcheck-small
+        fi
+        set -eo pipefail
+        if [ "$T" = "production" ]; then
+            ./configure \
+                --prefix=${TRAVIS_BUILD_DIR}/gpsql \
+                --with-perl \
+                --with-python \
+                --disable-orca \
+                --with-openssl \
+                --with-ldap \
+                --with-libcurl \
+                --with-libxml \
+                --enable-mapreduce \
+                --enable-orafce \
+                $C
+            make -s install
+            source ${TRAVIS_BUILD_DIR}/gpsql/greenplum_path.sh
+            make -s unittest-check
+            make -C gpAux/gpdemo cluster
+            source gpAux/gpdemo/gpdemo-env.sh
+            make -C src/test/regress installcheck-small
+        fi
+        set -eo pipefail
+        if [ "$T" = "macos" ]; then
+          ./configure \
+              --prefix=${TRAVIS_BUILD_DIR}/gpsql \
+              --with-perl \
+              --with-python \
+              --disable-orca \
+              --enable-orafce \
+              --disable-gpfdist \
+              --disable-pxf \
+              --disable-gpcloud \
+              --without-zstd \
+              $C
+          make -s install
+          source ${TRAVIS_BUILD_DIR}/gpsql/greenplum_path.sh
+          make -s unittest-check
+        fi
+        EOF
+        chmod +x ./test.sh
+        ./test.sh
+
+    - name: after script
+      run: |
+        source ${TRAVIS_BUILD_DIR}/gpsql/greenplum_path.sh
+        postgres --version
+        gpssh --version
