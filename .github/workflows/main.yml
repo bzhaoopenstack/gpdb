@@ -52,10 +52,10 @@ jobs:
         ssh-keygen -t "rsa" -f ~/.ssh/id_rsa -N ""
         cp ~/.ssh/{id_rsa.pub,authorized_keys}
 
-    - name: Fix configure error readline library not found
+    - name: Fix configure error library not found
       run: |
         sudo apt update
-        sudo apt install libreadline-dev -y
+        sudo apt install libreadline-dev libyaml-dev zlib1g zlib1g-dev -y
 
     - name: Run test script
       run: |
