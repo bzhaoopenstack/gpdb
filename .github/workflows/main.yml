@@ -61,6 +61,7 @@ jobs:
 
     - name: Run test script
       run: |
+        export TRAVIS_BUILD_DIR=`pwd`/bzhaoopenstack
         cd bzhaoopenstack/gpdb
         cat <<EOF > test.sh
         set -x
