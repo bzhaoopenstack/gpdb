@@ -39,7 +39,6 @@ jobs:
 
     - name: install python deps
       run: |
-        pip install --user --upgrade pip
         pip install --user --pre psutil
         pip install --user lockfile
         pip install --user setuptools
