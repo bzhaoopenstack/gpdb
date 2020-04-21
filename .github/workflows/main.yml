@@ -22,7 +22,7 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
     
-    - name: install deps - mine
+    - name: MY -- install deps - mine
       run: |
         sudo apt update
         sudo apt install software-properties-common git-all python-setuptools build-essential -y
@@ -42,7 +42,11 @@ jobs:
         pip install --user --pre psutil
         pip install --user lockfile
         pip install --user setuptools
-    
+
+    - name: MY -- clean .ssh
+      run: |
+        rm -rf ~/.ssh
+
     - name: before run scripts
       run: |
         ssh-keygen -t "rsa" -f ~/.ssh/id_rsa -N ""
