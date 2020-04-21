@@ -56,7 +56,8 @@ jobs:
       run: |
         sudo apt update
         sudo apt install libreadline-dev libyaml-dev zlib1g zlib1g-dev \
-                         libssl-dev libcurl4-openssl-dev libbz2-dev libldap2-dev -y
+                         libssl-dev libcurl4-openssl-dev libbz2-dev libldap2-dev \
+                         bison -y
 
     - name: Run test script
       run: |
