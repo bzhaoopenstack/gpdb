@@ -55,7 +55,7 @@ jobs:
     - name: Fix configure error readline library not found
       run: |
         sudo apt update
-        sudo apt install libreadline -y
+        sudo apt install libreadline-dev -y
 
     - name: Run test script
       run: |
