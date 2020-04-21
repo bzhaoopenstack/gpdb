@@ -55,7 +55,7 @@ jobs:
     - name: Fix configure error library not found
       run: |
         sudo apt update
-        sudo apt install libreadline-dev libyaml-dev zlib1g zlib1g-dev -y
+        sudo apt install libreadline-dev libyaml-dev zlib1g zlib1g-dev libssl-dev -y
 
     - name: Run test script
       run: |
