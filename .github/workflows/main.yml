@@ -25,7 +25,7 @@ jobs:
     - name: install deps - mine
       run: |
         sudo apt update
-        sudo apt install software-properties-common git-all python-setuptools -y
+        sudo apt install software-properties-common git-all python-setuptools build-essential -y
 
     - name: install deps
       run: |
