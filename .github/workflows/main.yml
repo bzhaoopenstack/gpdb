@@ -84,7 +84,7 @@ jobs:
               $C
           make -s install
           source ${TRAVIS_BUILD_DIR}/gpsql/greenplum_path.sh
-          make -s unittest-check || exit 0
+          make -s unittest-check || true
           cat src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c | grep -v 'check_expected(args);' > src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c_new
           mv src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c_new src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c
           make -s unittest-check
@@ -107,7 +107,7 @@ jobs:
                 $C
             make -s install
             source ${TRAVIS_BUILD_DIR}/gpsql/greenplum_path.sh
-            make -s unittest-check || exit 0
+            make -s unittest-check || true
             cat src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c | grep -v 'check_expected(args);' > src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c_new
             mv src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c_new src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c
             make -s unittest-check
@@ -129,7 +129,7 @@ jobs:
               $C
           make -s install
           source ${TRAVIS_BUILD_DIR}/gpsql/greenplum_path.sh
-          make -s unittest-check || exit 0
+          make -s unittest-check || true
           cat src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c | grep -v 'check_expected(args);' > src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c_new
           mv src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c_new src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c
           make -s unittest-check
@@ -140,6 +140,7 @@ jobs:
 
     - name: after script
       run: |
+        export TRAVIS_BUILD_DIR=`pwd`/bzhaoopenstack
         source ${TRAVIS_BUILD_DIR}/gpsql/greenplum_path.sh
         postgres --version
         gpssh --version
