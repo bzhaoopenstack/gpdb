@@ -52,7 +52,6 @@ matrix:
         # Ubuntu Xenial, clang 7
         - os: linux
           dist: xenial
-          arch: arm64
           compiler: clang
           env:
               - T=debug C=""
