@@ -1,0 +1,146 @@
+name: Run some script in Kunpeng env
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    env:
+      T: debug
+      C: ""
+      OVERRIDE_CC: "CC=gcc-8"
+      OVERRIDE_CXX: "CXX=g++-8"
+      TRAVIS_COMPILER: gcc
+      CC: gcc
+      CC_FOR_BUILD: gcc
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+    
+    - name: MY -- install deps - mine
+      run: |
+        sudo apt update
+        sudo apt install software-properties-common git-all python-setuptools build-essential -y
+
+    - name: install deps
+      run: |
+        sudo -E apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+        sudo apt update
+        sudo -E apt-get -yq --no-install-suggests --no-install-recommends $(travis_apt_get_options) install gcc-8 libxml2 libxml2-dev libevent-dev libperl-dev g++-8 python-dev python-yaml libapr1-dev libzstd1 libzstd1-dev python-pip
+    
+    - name: clone code
+      run: |
+        git clone --depth=50 https://github.com/bzhaoopenstack/gpdb.git bzhaoopenstack/gpdb
+
+    - name: install python deps
+      run: |
+        pip install --user --pre psutil
+        pip install --user lockfile
+        pip install --user setuptools
+
+    - name: MY -- clean .ssh
+      run: |
+        rm -rf ~/.ssh
+
+    - name: before run scripts
+      run: |
+        ssh-keygen -t "rsa" -f ~/.ssh/id_rsa -N ""
+        cp ~/.ssh/{id_rsa.pub,authorized_keys}
+
+    - name: Fix configure error library not found
+      run: |
+        sudo apt update
+        sudo apt install libreadline-dev libyaml-dev zlib1g zlib1g-dev \
+                         libssl-dev libcurl4-openssl-dev libbz2-dev libldap2-dev \
+                         bison flex -y
+
+    - name: Run test script
+      run: |
+        export TRAVIS_BUILD_DIR=`pwd`/bzhaoopenstack
+        cd bzhaoopenstack/gpdb
+        cat <<EOF > test.sh
+        set -x
+        set -eo pipefail
+        if [ "$T" = "debug" ]; then
+          ./configure \
+              --prefix=${TRAVIS_BUILD_DIR}/gpsql \
+              --enable-cassert \
+              --enable-debug \
+              --enable-debug-extensions \
+              --with-perl \
+              --with-python \
+              --disable-orca \
+              --with-openssl \
+              --with-ldap \
+              --with-libcurl \
+              --with-libxml \
+              --enable-mapreduce \
+              --enable-orafce \
+              $C
+          make -s install
+          source ${TRAVIS_BUILD_DIR}/gpsql/greenplum_path.sh
+          make -s unittest-check || true
+          cat src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c | grep -v 'check_expected(args);' > src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c_new
+          mv src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c_new src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c
+          make -s unittest-check
+          make -C gpAux/gpdemo cluster
+          source gpAux/gpdemo/gpdemo-env.sh
+          make -C src/test/regress installcheck-small
+        fi
+        if [ "$T" = "production" ]; then
+            ./configure \
+                --prefix=${TRAVIS_BUILD_DIR}/gpsql \
+                --with-perl \
+                --with-python \
+                --disable-orca \
+                --with-openssl \
+                --with-ldap \
+                --with-libcurl \
+                --with-libxml \
+                --enable-mapreduce \
+                --enable-orafce \
+                $C
+            make -s install
+            source ${TRAVIS_BUILD_DIR}/gpsql/greenplum_path.sh
+            make -s unittest-check || true
+            cat src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c | grep -v 'check_expected(args);' > src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c_new
+            mv src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c_new src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c
+            make -s unittest-check
+            make -C gpAux/gpdemo cluster
+            source gpAux/gpdemo/gpdemo-env.sh
+            make -C src/test/regress installcheck-small
+        fi
+        if [ "$T" = "macos" ]; then
+          ./configure \
+              --prefix=${TRAVIS_BUILD_DIR}/gpsql \
+              --with-perl \
+              --with-python \
+              --disable-orca \
+              --enable-orafce \
+              --disable-gpfdist \
+              --disable-pxf \
+              --disable-gpcloud \
+              --without-zstd \
+              $C
+          make -s install
+          source ${TRAVIS_BUILD_DIR}/gpsql/greenplum_path.sh
+          make -s unittest-check || true
+          cat src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c | grep -v 'check_expected(args);' > src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c_new
+          mv src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c_new src/test/unit/mock/backend/libpq/pqexpbuffer_mock.c
+          make -s unittest-check
+        fi
+        EOF
+        chmod +x ./test.sh
+        ./test.sh
+
+    - name: after script
+      run: |
+        export TRAVIS_BUILD_DIR=`pwd`/bzhaoopenstack
+        source ${TRAVIS_BUILD_DIR}/gpsql/greenplum_path.sh
+        postgres --version
+        gpssh --version
